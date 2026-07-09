@@ -23,7 +23,7 @@ import {
   GuildLeaveHandler,
   MessageHandler,
   ReactionHandler,
-  TriggerHandler, // <--- نسيت هادي فالمرة اللي فاتت
+  TriggerHandler,
 } from "./events/index.js";
 import { CustomClient } from "./extensions/index.js";
 import { Job } from "./jobs/index.js";
@@ -38,84 +38,20 @@ import {
 import { Trigger } from "./triggers/index.js";
 
 const require = createRequire(import.meta.url);
-let Config = require("./config/config.json");
-let Logs = require("./lang/logs.json");
+const Config = require("./config/config.json");
+const Logs = require("./lang/logs.json");
 
 async function start(): Promise<void> {
-  // Services
-  let eventDataService = new EventDataService();
+  const eventDataService = new EventDataService();
 
-  // Client
-  let client = new CustomClient({
+  const client = new CustomClient({
     intents: Config.client.intents,
     partials: [Config.client.partials as string[]].map((partial) => Partials[partial]),
     makeCache: Options.cacheWithLimits({
-    ...Options.DefaultMakeCacheSettings,
-    ...Config.client.caches,
+     ...Options.DefaultMakeCacheSettings,
+     ...Config.client.caches,
     }),
     enforceNonce: true,
   });
 
-  // Commands
-  let commands: Command[] = [
-    new DevCommand(),
-    new HelpCommand(),
-    new InfoCommand(),
-    new TestCommand(),
-    new ViewDateSent(),
-    new ViewDateJoined(),
-  ];
-
-  let buttons: Button[] = [];
-  let reactions: Reaction[] = [];
-  let triggers: Trigger[] = [];
-
-  // Event handlers
-  let guildJoinHandler = new GuildJoinHandler(eventDataService);
-  let guildLeaveHandler = new GuildLeaveHandler();
-  let commandHandler = new CommandHandler(commands, eventDataService);
-  let buttonHandler = new ButtonHandler(buttons, eventDataService);
-  let triggerHandler = new TriggerHandler(triggers, eventDataService);
-  let messageHandler = new MessageHandler(triggerHandler);
-  let reactionHandler = new ReactionHandler(reactions, eventDataService);
-
-  let jobs: Job[] = [];
-
-  // === التوكن كامل هنا داخل function ===
-  const token = process.env.TOKEN || Config.client.token;
-
-  if (!token || token === "YOUR_BOT_TOKEN_HERE") {
-    Logger.error("❌ التوكن ماشي موجود! حطو فـ Railway Variables");
-    process.exit(1);
-  }
-  // =====================================
-
-  // Bot
-  let bot = new Bot({
-    token: token,
-    client,
-    guildJoinHandler,
-    guildLeaveHandler,
-    messageHandler,
-    commandHandler,
-    buttonHandler,
-    reactionHandler,
-    new JobService(jobs),
-  });
-
-  // Register
-  if (process.argv[2] == "commands") {
-    try {
-      const rest = new REST({ version: "10" }).setToken(token);
-      let commandRegistrationService = new CommandRegistrationService(rest);
-      let localCmds = [
-      ...Object.values(ChatCommandMetadata).sort((a, b) => (a.name > b.name? 1 : -1)),
-      ...Object.values(MessageCommandMetadata).sort((a, b) => (a.name > b.name? 1 : -1)),
-      ...Object.values(UserCommandMetadata).sort((a, b) => (a.name > b.name? 1 : -1)),
-      ];
-      await commandRegistrationService.process(localCmds, process.argv);
-    } catch (error) {
-      Logger.error(Logs.error.commandAction, error);
-    }
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    process.exit();
+  const commands: Command[] =

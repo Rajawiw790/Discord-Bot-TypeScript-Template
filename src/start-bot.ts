@@ -30,6 +30,8 @@ import {
     EventDataService,
     JobService,
     Logger,
+    import dotenv from "dotenv";
+dotenv.config();
 } from './services/index.js';
 import { Trigger } from './triggers/index.js';
 

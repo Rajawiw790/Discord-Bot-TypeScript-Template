@@ -2,7 +2,7 @@
     "developers": ["<YOUR_DISCORD_ID>"],
     "client": {
         "id": "<1422331140122869801>",
-        "token": "<MTQyMjMzMTE0MDEyMjg2OTgwMQ.GRTKmL.fSQCzOvtRF0VzeO0j0fRYQgr2v7-9MaOAtm5Jc>",
+        "token": "YOUR_BOT_TOKEN_HERE"
         "intents": [
             "Guilds",
             "GuildMessages",

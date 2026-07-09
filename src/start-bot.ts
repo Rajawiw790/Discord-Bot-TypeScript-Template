@@ -30,9 +30,9 @@ import {
     EventDataService,
     JobService,
     Logger,
-    import dotenv from "dotenv";
-dotenv.config();
 } from './services/index.js';
+import dotenv from 'dotenv';
+dotenv.config();
 import { Trigger } from './triggers/index.js';
 
 const require = createRequire(import.meta.url);
@@ -110,7 +110,7 @@ if (!token || token === "YOUR_BOT_TOKEN_HERE") {
 }
     // Bot
     let bot = new Bot(
-        token: token,
+        token,
         client,
         guildJoinHandler,
         guildLeaveHandler,
@@ -124,7 +124,7 @@ if (!token || token === "YOUR_BOT_TOKEN_HERE") {
     // Register
     if (process.argv[2] == 'commands') {
         try {
-            rest.setToken(token);
+            let rest = new REST({ version: '10' }).setToken(token);
             let commandRegistrationService = new CommandRegistrationService(rest);
             let localCmds = [
                 ...Object.values(ChatCommandMetadata).sort((a, b) => (a.name > b.name ? 1 : -1)),

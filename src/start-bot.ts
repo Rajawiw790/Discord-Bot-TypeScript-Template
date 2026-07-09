@@ -101,10 +101,16 @@ async function start(): Promise<void> {
     let jobs: Job[] = [
         // TODO: Add new jobs here
     ];
+    
+const token = process.env.TOKEN || Config.client.token;
 
+if (!token || token === "YOUR_BOT_TOKEN_HERE") {
+  Logger.error("❌ التوكن ماشي موجود! حطو فـ Railway Variables");
+  process.exit(1);
+}
     // Bot
     let bot = new Bot(
-        Config.client.token,
+        token: token,
         client,
         guildJoinHandler,
         guildLeaveHandler,
@@ -118,7 +124,7 @@ async function start(): Promise<void> {
     // Register
     if (process.argv[2] == 'commands') {
         try {
-            let rest = new REST({ version: '10' }).setToken(Config.client.token);
+            rest.setToken(token);
             let commandRegistrationService = new CommandRegistrationService(rest);
             let localCmds = [
                 ...Object.values(ChatCommandMetadata).sort((a, b) => (a.name > b.name ? 1 : -1)),

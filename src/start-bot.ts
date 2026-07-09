@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-dotenv.config(); // <--- زيد هادي فـ اللول
+dotenv.config();
 
 import { REST } from "@discordjs/rest";
 import { Options, Partials } from "discord.js";
@@ -23,6 +23,7 @@ import {
   GuildLeaveHandler,
   MessageHandler,
   ReactionHandler,
+  TriggerHandler, // <--- نسيت هادي فالمرة اللي فاتت
 } from "./events/index.js";
 import { CustomClient } from "./extensions/index.js";
 import { Job } from "./jobs/index.js";
@@ -49,8 +50,8 @@ async function start(): Promise<void> {
     intents: Config.client.intents,
     partials: [Config.client.partials as string[]].map((partial) => Partials[partial]),
     makeCache: Options.cacheWithLimits({
-     ...Options.DefaultMakeCacheSettings,
-     ...Config.client.caches,
+    ...Options.DefaultMakeCacheSettings,
+    ...Config.client.caches,
     }),
     enforceNonce: true,
   });
@@ -80,17 +81,18 @@ async function start(): Promise<void> {
 
   let jobs: Job[] = [];
 
-  // التوكن هنا داخل function ✅
+  // === التوكن كامل هنا داخل function ===
   const token = process.env.TOKEN || Config.client.token;
 
   if (!token || token === "YOUR_BOT_TOKEN_HERE") {
     Logger.error("❌ التوكن ماشي موجود! حطو فـ Railway Variables");
     process.exit(1);
   }
+  // =====================================
 
   // Bot
   let bot = new Bot({
-    token: token, // <--- استعمل token
+    token: token,
     client,
     guildJoinHandler,
     guildLeaveHandler,
@@ -104,12 +106,12 @@ async function start(): Promise<void> {
   // Register
   if (process.argv[2] == "commands") {
     try {
-      const rest = new REST({ version: "10" }).setToken(token); // <--- استعمل token
+      const rest = new REST({ version: "10" }).setToken(token);
       let commandRegistrationService = new CommandRegistrationService(rest);
       let localCmds = [
-       ...Object.values(ChatCommandMetadata).sort((a, b) => (a.name > b.name? 1 : -1)),
-       ...Object.values(MessageCommandMetadata).sort((a, b) => (a.name > b.name? 1 : -1)),
-       ...Object.values(UserCommandMetadata).sort((a, b) => (a.name > b.name? 1 : -1)),
+      ...Object.values(ChatCommandMetadata).sort((a, b) => (a.name > b.name? 1 : -1)),
+      ...Object.values(MessageCommandMetadata).sort((a, b) => (a.name > b.name? 1 : -1)),
+      ...Object.values(UserCommandMetadata).sort((a, b) => (a.name > b.name? 1 : -1)),
       ];
       await commandRegistrationService.process(localCmds, process.argv);
     } catch (error) {
@@ -117,11 +119,3 @@ async function start(): Promise<void> {
     }
     await new Promise((resolve) => setTimeout(resolve, 1000));
     process.exit();
-  }
-
-  await bot.start();
-}
-
-start().catch((error) => {
-  Logger.error(Logs.error.unspecified, error);
-});
